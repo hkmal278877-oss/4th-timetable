@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الجدول الاسبوعي - الرابع أ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg-color: #f0f4f9;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --accent-blue: #0284c7;
+            --active-tab-bg: #e0f2fe;
+            --active-tab-border: #0284c7;
+            --active-tab-text: #0369a1;
+            --inactive-tab-bg: #e2e8f0;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --radius-lg: 20px;
+            --radius-md: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 30px;
+        }
+
+        /* Top Header Navigation */
+        .app-bar {
+            background: #eef5ff;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .app-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            color: #334155;
+            cursor: pointer;
+        }
+
+        /* Days Selector Horizontal Scroll */
+        .days-nav-wrapper {
+            padding: 15px 0 10px 0;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: none;
+        }
+
+        .days-nav-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+        .days-container {
+            display: inline-flex;
+            gap: 10px;
+            padding: 0 16px;
+        }
+
+        .day-tab {
+            background-color: var(--inactive-tab-bg);
+            color: #475569;
+            border: 2px solid transparent;
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .day-tab.active {
+            background-color: var(--active-tab-bg);
+            border-color: var(--active-tab-border);
+            color: var(--active-tab-text);
+        }
+
+        /* Container & Lesson Cards List */
+        .content-area {
+            padding: 10px 16px;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .lessons-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .lesson-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .lesson-card:active {
+            transform: scale(0.99);
+        }
+
+        .lesson-details {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .subject-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .lesson-subinfo {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            font-weight: 500;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .lesson-subinfo span {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .lesson-number-badge {
+            font-size: 0.85rem;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        /* Subject Icon Container */
+        .icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        /* Dynamic Theme Icon Colors */
+        .icon-math { background-color: #dbeafe; color: #1d4ed8; }
+        .icon-arabic { background-color: #ffe4e6; color: #e11d48; }
+        .icon-english { background-color: #f3e8ff; color: #7e22ce; }
+        .icon-library { background-color: #fce7f3; color: #be185d; }
+        .icon-cs { background-color: #ccfbf1; color: #0f766e; }
+        .icon-chem { background-color: #fef3c7; color: #b45309; }
+        .icon-physics { background-color: #e0e7ff; color: #4338ca; }
+        .icon-bio { background-color: #dcfce7; color: #15803d; }
+        .icon-islamic { background-color: #d1fae5; color: #047857; }
+        .icon-art { background-color: #ffedd5; color: #c2410c; }
+        .icon-french { background-color: #e0f2fe; color: #0369a1; }
+        .icon-sport { background-color: #f1f5f9; color: #334155; }
+
+        /* Floating Action Button */
+        .fab-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 54px;
+            height: 54px;
+            border-radius: 18px;
+            background-color: #6b21a8;
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            box-shadow: 0 6px 16px rgba(107, 33, 168, 0.35);
+            cursor: pointer;
+        }
+
+        .holiday-card {
+            text-align: center;
+            padding: 40px 20px;
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            color: var(--text-sub);
+            font-weight: 700;
+            box-shadow: var(--shadow-sm);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- App Header -->
+    <div class="app-bar">
+        <div class="app-title">الجدول الاسبوعي</div>
+        <button class="menu-btn"><i class="fa-solid fa-bars"></i></button>
+    </div>
+
+    <!-- Days Navigation -->
+    <div class="days-nav-wrapper">
+        <div class="days-container" id="days-tabs"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content-area">
+        <div class="lessons-list" id="lessons-list"></div>
+    </div>
+
+    <!-- Floating Share Button -->
+    <button class="fab-btn" onclick="shareSchedule()">
+        <i class="fa-solid fa-share-nodes"></i>
+    </button>
+
+<script>
+    // أسماء الدروس بالعربي
+    const lessonNames = ["الدرس الأول", "الدرس الثاني", "الدرس الثالث", "الدرس الرابع", "الدرس الخامس", "الدرس السادس"];
+
+    // البيانات الكاملة مع الأيقونات والمدرسين والقاعات
+    const timetableData = {
+        "الاحد": [
+            { subject: "الرياضيات", teacher: "سامر بشير", room: "ق. الرياضيات ٢", time: "8:00 - 8:40", iconClass: "icon-math", iconHtml: '<i class="fa-solid fa-calculator"></i>' },
+            { subject: "اللغة العربية", teacher: "علي عبود", room: "ق. العربية ٣", time: "8:45 - 9:25", iconClass: "icon-arabic", iconHtml: '<i class="fa-solid fa-book-open"></i>' },
+            { subject: "اللغة الانكليزية", teacher: "حسن ياسر", room: "ق. الانكليزية ٢", time: "9:30 - 10:10", iconClass: "icon-english", iconHtml: 'En' },
+            { subject: "مكتبة", teacher: "هادي جميل", room: "مكتبة", time: "10:15 - 10:55", iconClass: "icon-library", iconHtml: '<i class="fa-solid fa-bookmark"></i>' },
+            { subject: "الحاسوب", teacher: "عبدالله صاحب", room: "م. الحاسوب", time: "11:00 - 11:40", iconClass: "icon-cs", iconHtml: '<i class="fa-solid fa-desktop"></i>' },
+            { subject: "الكيمياء", teacher: "هشام فاضل", room: "ق. الكيمياء ١", time: "11:45 - 12:25", iconClass: "icon-chem", iconHtml: '<i class="fa-solid fa-vial"></i>' }
+        ],
+        "الاثنين": [
+            { subject: "الرياضيات", teacher: "سامر بشير", room: "ق. الرياضيات ٣", time: "8:00 - 8:40", iconClass: "icon-math", iconHtml: '<i class="fa-solid fa-calculator"></i>' },
+            { subject: "التربية الفنية", teacher: "أبي ذر ماجد", room: "ق. الفنية", time: "8:45 - 9:25", iconClass: "icon-art", iconHtml: '<i class="fa-solid fa-palette"></i>' },
+            { subject: "اللغة العربية", teacher: "علي عبود", room: "ق. العربية ١", time: "9:30 - 10:10", iconClass: "icon-arabic", iconHtml: '<i class="fa-solid fa-book-open"></i>' },
+            { subject: "اللغة الانكليزية", teacher: "حسن ياسر", room: "ق. الانكليزية ٤", time: "10:15 - 10:55", iconClass: "icon-english", iconHtml: 'En' },
+            { subject: "الاحياء", teacher: "علي عبدالمهدي", room: "ق. الاسلامية ١", time: "11:00 - 11:40", iconClass: "icon-bio", iconHtml: '<i class="fa-solid fa-dna"></i>' },
+            { subject: "الفيزياء", teacher: "حيدر عامر", room: "ق. الانكليزية ٤", time: "11:45 - 12:25", iconClass: "icon-physics", iconHtml: '<i class="fa-solid fa-atom"></i>' }
+        ],
+        "الثلاثاء": [
+            { subject: "الاحياء", teacher: "علي عبدالمهدي", room: "ق. الاسلامية ١", time: "8:00 - 8:40", iconClass: "icon-bio", iconHtml: '<i class="fa-solid fa-dna"></i>' },
+            { subject: "اللغة العربية", teacher: "علي عبود", room: "ق. العربية ٣", time: "8:45 - 9:25", iconClass: "icon-arabic", iconHtml: '<i class="fa-solid fa-book-open"></i>' },
+            { subject: "اللغة الانكليزية", teacher: "حسن ياسر", room: "ق. الانكليزية ٤", time: "9:30 - 10:10", iconClass: "icon-english", iconHtml: 'En' },
+            { subject: "اللغة الفرنسية", teacher: "علي محسن", room: "ق. الفرنسية", time: "10:15 - 10:55", iconClass: "icon-french", iconHtml: 'Fr' },
+            { subject: "التربية الاسلامية", teacher: "سيد فراس", room: "ق. الاسلامية ٢", time: "11:00 - 11:40", iconClass: "icon-islamic", iconHtml: '<i class="fa-solid fa-mosque"></i>' },
+            { subject: "الرياضيات", teacher: "سامر بشير", room: "ق. الرياضيات ٢", time: "11:45 - 12:25", iconClass: "icon-math", iconHtml: '<i class="fa-solid fa-calculator"></i>' }
+        ],
+        "الاربعاء": [
+            { subject: "اللغة العربية", teacher: "علي عبود", room: "ق. العربية ٢", time: "8:00 - 8:40", iconClass: "icon-arabic", iconHtml: '<i class="fa-solid fa-book-open"></i>' },
+            { subject: "الحاسوب", teacher: "عبدالله صاحب", room: "م. الحاسوب", time: "8:45 - 9:25", iconClass: "icon-cs", iconHtml: '<i class="fa-solid fa-desktop"></i>' },
+            { subject: "الرياضيات", teacher: "سامر بشير", room: "قاعة الرياضيات ٤", time: "9:30 - 10:10", iconClass: "icon-math", iconHtml: '<i class="fa-solid fa-calculator"></i>' },
+            { subject: "الرياضة", teacher: "منتظر سبورتيف", room: "ساحة", time: "10:15 - 10:55", iconClass: "icon-sport", iconHtml: '<i class="fa-solid fa-volleyball"></i>' },
+            { subject: "التربية الاسلامية", teacher: "سيد فراس", room: "ق. الاسلامية ١", time: "11:00 - 11:40", iconClass: "icon-islamic", iconHtml: '<i class="fa-solid fa-mosque"></i>' },
+            { subject: "اللغة الانكليزية", teacher: "حسن ياسر", room: "ق. الانكليزية ٤", time: "11:45 - 12:25", iconClass: "icon-english", iconHtml: 'En' }
+        ],
+        "الخميس": [
+            { subject: "الاحياء", teacher: "علي عبدالمهدي", room: "ق. الاحياء ١", time: "8:00 - 8:40", iconClass: "icon-bio", iconHtml: '<i class="fa-solid fa-dna"></i>' },
+            { subject: "اللغة الانكليزية", teacher: "حسن ياسر", room: "ق. الانكليزية ٢", time: "8:45 - 9:25", iconClass: "icon-english", iconHtml: 'En' },
+            { subject: "جرائم البعث", teacher: "عامر عبدالرزاق", room: "ق. الاجتماعيات ٢", time: "9:30 - 10:10", iconClass: "icon-library", iconHtml: '<i class="fa-solid fa-monument"></i>' },
+            { subject: "اللغة العربية", teacher: "علي عبود", room: "ق. العربية ٣", time: "10:15 - 10:55", iconClass: "icon-arabic", iconHtml: '<i class="fa-solid fa-book-open"></i>' },
+            { subject: "الفيزياء", teacher: "حيدر عامر", room: "ق. الفيزياء ١", time: "11:00 - 11:40", iconClass: "icon-physics", iconHtml: '<i class="fa-solid fa-atom"></i>' },
+            { subject: "الكيمياء", teacher: "هشام فاضل", room: "ق. الكيمياء ١", time: "11:45 - 12:25", iconClass: "icon-chem", iconHtml: '<i class="fa-solid fa-vial"></i>' }
+        ]
+    };
+
+    const days = Object.keys(timetableData);
+
+    function getCurrentDay() {
+        const d = new Date().getDay();
+        const map = { 0: "الاحد", 1: "الاثنين", 2: "الثلاثاء", 3: "الاربعاء", 4: "الخميس", 5: "الاحد", 6: "الاحد" };
+        return map[d] || "الاحد";
+    }
+
+    let activeDay = getCurrentDay();
+
+    function renderTabs() {
+        const container = document.getElementById('days-tabs');
+        container.innerHTML = '';
+        days.forEach(day => {
+            const btn = document.createElement('button');
+            btn.className = `day-tab ${day === activeDay ? 'active' : ''}`;
+            btn.innerText = day;
+            btn.onclick = () => {
+                activeDay = day;
+                renderTabs();
+                renderLessons();
+            };
+            container.appendChild(btn);
+        });
+    }
+
+    function renderLessons() {
+        const list = document.getElementById('lessons-list');
+        list.innerHTML = '';
+
+        const lessons = timetableData[activeDay] || [];
+        
+        lessons.forEach((l, index) => {
+            const card = document.createElement('div');
+            card.className = 'lesson-card';
+            card.innerHTML = `
+                <div class="lesson-details">
+                    <div class="subject-title">${l.subject}</div>
+                    <div class="lesson-number-badge">${lessonNames[index]}</div>
+                    <div class="lesson-subinfo">
+                        <span><i class="fa-regular fa-user"></i> ${l.teacher}</span>
+                        <span>•</span>
+                        <span><i class="fa-solid fa-location-dot"></i> ${l.room}</span>
+                    </div>
+                </div>
+                <div class="icon-box ${l.iconClass}">
+                    ${l.iconHtml}
+                </div>
+            `;
+            list.appendChild(card);
+        });
+    }
+
+    function shareSchedule() {
+        if (navigator.share) {
+            navigator.share({
+                title: 'جدول الرابع أ',
+                url: window.location.href
+            });
+        } else {
+            navigator.clipboard.writeText(window.location.href);
+            alert('تم نسخ رابط الجدول!');
+        }
+    }
+
+    // Initialize
+    renderTabs();
+    renderLessons();
+</script>
+</body>
+</html>
