@@ -9,19 +9,36 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
+            /* Light Theme Variables */
             --bg-color: #f0f4f9;
+            --appbar-bg: #eef5ff;
             --card-bg: #ffffff;
             --text-main: #1e293b;
             --text-sub: #64748b;
-            --accent-blue: #0284c7;
             --active-tab-bg: #e0f2fe;
             --active-tab-border: #0284c7;
             --active-tab-text: #0369a1;
             --inactive-tab-bg: #e2e8f0;
+            --card-border: rgba(226, 232, 240, 0.8);
+            --drawer-bg: #ffffff;
             --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
             --radius-lg: 20px;
-            --radius-md: 16px;
+        }
+
+        /* Dark Theme Variables */
+        body.dark-theme {
+            --bg-color: #1a1a1a;
+            --appbar-bg: #222222;
+            --card-bg: #333333;
+            --text-main: #ffffff;
+            --text-sub: #a1a1aa;
+            --active-tab-bg: #1e293b;
+            --active-tab-border: #38bdf8;
+            --active-tab-text: #38bdf8;
+            --inactive-tab-bg: #2d2d2d;
+            --card-border: #404040;
+            --drawer-bg: #262626;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
         * {
@@ -30,6 +47,7 @@
             padding: 0;
             font-family: 'Tajawal', sans-serif;
             -webkit-tap-highlight-color: transparent;
+            transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
         }
 
         body {
@@ -43,7 +61,7 @@
 
         /* Top Header Navigation */
         .app-bar {
-            background: #eef5ff;
+            background: var(--appbar-bg);
             padding: 16px 20px;
             display: flex;
             align-items: center;
@@ -56,7 +74,6 @@
         .app-title {
             font-size: 1.25rem;
             font-weight: 800;
-            color: #0f172a;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -65,9 +82,92 @@
         .menu-btn {
             background: none;
             border: none;
-            font-size: 1.3rem;
-            color: #334155;
+            font-size: 1.4rem;
+            color: var(--text-main);
             cursor: pointer;
+            padding: 4px;
+        }
+
+        /* Side Drawer Menu */
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .drawer-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: -280px;
+            width: 280px;
+            height: 100%;
+            background: var(--drawer-bg);
+            z-index: 100;
+            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.2);
+            padding: 24px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            transition: right 0.3s ease;
+        }
+
+        .drawer.active {
+            right: 0;
+        }
+
+        .drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 15px;
+        }
+
+        .drawer-header h3 {
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+
+        .close-drawer-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--text-sub);
+            cursor: pointer;
+        }
+
+        .drawer-menu-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--inactive-tab-bg);
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            width: 100%;
+            font-size: 0.95rem;
+        }
+
+        .drawer-menu-item div {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         /* Days Selector Horizontal Scroll */
@@ -90,14 +190,13 @@
 
         .day-tab {
             background-color: var(--inactive-tab-bg);
-            color: #475569;
+            color: var(--text-sub);
             border: 2px solid transparent;
             padding: 10px 24px;
             border-radius: 30px;
             font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s ease;
         }
 
         .day-tab.active {
@@ -128,12 +227,7 @@
             align-items: center;
             justify-content: space-between;
             box-shadow: var(--shadow-sm);
-            border: 1px solid rgba(226, 232, 240, 0.8);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .lesson-card:active {
-            transform: scale(0.99);
+            border: 1px solid var(--card-border);
         }
 
         .lesson-details {
@@ -145,7 +239,7 @@
         .subject-title {
             font-size: 1.15rem;
             font-weight: 800;
-            color: #0f172a;
+            color: var(--text-main);
         }
 
         .lesson-subinfo {
@@ -165,7 +259,7 @@
 
         .lesson-number-badge {
             font-size: 0.85rem;
-            color: #64748b;
+            color: var(--text-sub);
             font-weight: 600;
         }
 
@@ -214,24 +308,41 @@
             box-shadow: 0 6px 16px rgba(107, 33, 168, 0.35);
             cursor: pointer;
         }
-
-        .holiday-card {
-            text-align: center;
-            padding: 40px 20px;
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            color: var(--text-sub);
-            font-weight: 700;
-            box-shadow: var(--shadow-sm);
-        }
     </style>
 </head>
 <body>
 
-    <!-- App Header -->
+    <!-- Top Navigation -->
     <div class="app-bar">
         <div class="app-title">الجدول الاسبوعي</div>
-        <button class="menu-btn"><i class="fa-solid fa-bars"></i></button>
+        <button class="menu-btn" onclick="toggleDrawer()"><i class="fa-solid fa-bars"></i></button>
+    </div>
+
+    <!-- Side Menu Overlay & Drawer -->
+    <div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer()"></div>
+    <div class="drawer" id="drawer">
+        <div class="drawer-header">
+            <h3>القائمة</h3>
+            <button class="close-drawer-btn" onclick="toggleDrawer()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <!-- Mode Toggle Button -->
+        <button class="drawer-menu-item" onclick="toggleTheme()">
+            <div>
+                <i class="fa-solid fa-moon" id="theme-icon"></i>
+                <span id="theme-text">الوضع الداكن</span>
+            </div>
+            <i class="fa-solid fa-chevron-left" style="font-size: 0.8rem;"></i>
+        </button>
+
+        <!-- Made By Abo3li Telegram Button -->
+        <a href="https://t.me/t9tt0" target="_blank" class="drawer-menu-item">
+            <div>
+                <i class="fa-brands fa-telegram" style="color: #0088cc;"></i>
+                <span>Made by Abo3li</span>
+            </div>
+            <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.8rem;"></i>
+        </a>
     </div>
 
     <!-- Days Navigation -->
@@ -239,7 +350,7 @@
         <div class="days-container" id="days-tabs"></div>
     </div>
 
-    <!-- Main Content -->
+    <!-- Main Content Area -->
     <div class="content-area">
         <div class="lessons-list" id="lessons-list"></div>
     </div>
@@ -250,10 +361,8 @@
     </button>
 
 <script>
-    // أسماء الدروس بالعربي
     const lessonNames = ["الدرس الأول", "الدرس الثاني", "الدرس الثالث", "الدرس الرابع", "الدرس الخامس", "الدرس السادس"];
 
-    // البيانات الكاملة مع الأيقونات والمدرسين والقاعات
     const timetableData = {
         "الاحد": [
             { subject: "الرياضيات", teacher: "سامر بشير", room: "ق. الرياضيات ٢", time: "8:00 - 8:40", iconClass: "icon-math", iconHtml: '<i class="fa-solid fa-calculator"></i>' },
@@ -283,7 +392,7 @@
             { subject: "اللغة العربية", teacher: "علي عبود", room: "ق. العربية ٢", time: "8:00 - 8:40", iconClass: "icon-arabic", iconHtml: '<i class="fa-solid fa-book-open"></i>' },
             { subject: "الحاسوب", teacher: "عبدالله صاحب", room: "م. الحاسوب", time: "8:45 - 9:25", iconClass: "icon-cs", iconHtml: '<i class="fa-solid fa-desktop"></i>' },
             { subject: "الرياضيات", teacher: "سامر بشير", room: "قاعة الرياضيات ٤", time: "9:30 - 10:10", iconClass: "icon-math", iconHtml: '<i class="fa-solid fa-calculator"></i>' },
-            { subject: "الرياضة", teacher: "منتظر سبورتيف", room: "ساحة", time: "10:15 - 10:55", iconClass: "icon-sport", iconHtml: '<i class="fa-solid fa-volleyball"></i>' },
+            { subject: "التربية الرياضية والبدنية", teacher: "منتظر سبورتيف", room: "ساحة", time: "10:15 - 10:55", iconClass: "icon-sport", iconHtml: '<i class="fa-solid fa-volleyball"></i>' },
             { subject: "التربية الاسلامية", teacher: "سيد فراس", room: "ق. الاسلامية ١", time: "11:00 - 11:40", iconClass: "icon-islamic", iconHtml: '<i class="fa-solid fa-mosque"></i>' },
             { subject: "اللغة الانكليزية", teacher: "حسن ياسر", room: "ق. الانكليزية ٤", time: "11:45 - 12:25", iconClass: "icon-english", iconHtml: 'En' }
         ],
@@ -350,6 +459,29 @@
         });
     }
 
+    // Drawer Open/Close Handler
+    function toggleDrawer() {
+        document.getElementById('drawer').classList.toggle('active');
+        document.getElementById('drawer-overlay').classList.toggle('active');
+    }
+
+    // Theme Switcher Handler
+    function toggleTheme() {
+        document.body.classList.toggle('dark-theme');
+        const isDark = document.body.classList.contains('dark-theme');
+        
+        const icon = document.getElementById('theme-icon');
+        const text = document.getElementById('theme-text');
+
+        if (isDark) {
+            icon.className = 'fa-solid fa-sun';
+            text.innerText = 'الوضع الفاتح';
+        } else {
+            icon.className = 'fa-solid fa-moon';
+            text.innerText = 'الوضع الداكن';
+        }
+    }
+
     function shareSchedule() {
         if (navigator.share) {
             navigator.share({
@@ -362,7 +494,6 @@
         }
     }
 
-    // Initialize
     renderTabs();
     renderLessons();
 </script>
